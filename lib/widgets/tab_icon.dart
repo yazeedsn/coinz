@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TabIcon extends StatelessWidget {
   const TabIcon({
@@ -10,9 +11,9 @@ class TabIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 25,
-      height: 25,
-      margin: const EdgeInsets.all(8),
+      width: 25.w,
+      height: 25.h,
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
       decoration: BoxDecoration(
         image: DecorationImage(
           fit: BoxFit.contain,

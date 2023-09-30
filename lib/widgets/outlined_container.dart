@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OutlinedContainer extends StatelessWidget {
   const OutlinedContainer({
@@ -20,11 +21,11 @@ class OutlinedContainer extends StatelessWidget {
       width: width,
       height: height,
       padding:
-          padding ?? const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          padding ?? EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         border: Border.all(color: const Color(0xFFF4F4F4)),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: child,
     );

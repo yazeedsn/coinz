@@ -1,3 +1,4 @@
+import 'package:coinz/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 const TextStyle splashStyle = TextStyle(
@@ -15,20 +16,20 @@ const TextStyle headingStyle = TextStyle(
 );
 
 const TextStyle secondaryStyle = TextStyle(
-  color: Color(0xFF95989C),
+  color: highlightTextColor,
   fontSize: 9,
   fontFamily: 'Swissra',
 );
 
 const TextStyle dropdownArStyle = TextStyle(
-  color: Colors.black,
+  color: primaryTextColor,
   fontSize: 11,
   fontFamily: 'Swissra',
   fontWeight: FontWeight.bold,
 );
 
 const TextStyle dropdownEnStyle = TextStyle(
-  color: Colors.black,
+  color: primaryTextColor,
   fontSize: 12,
   fontFamily: 'SF-Pro-Display',
   fontWeight: FontWeight.w500,
@@ -54,17 +55,17 @@ const TextStyle priceCardStyle = TextStyle(
   fontWeight: FontWeight.w600,
 );
 
-const TextStyle tableMainEnTextStyle =
-    TextStyle(color: Colors.black, fontSize: 11, fontFamily: 'SF-Pro-Display');
+const TextStyle tableMainEnTextStyle = TextStyle(
+    color: primaryTextColor, fontSize: 11, fontFamily: 'SF-Pro-Display');
 
 const TextStyle tableMainArTextStyle = TextStyle(
-    color: Colors.black,
+    color: primaryTextColor,
     fontSize: 10,
     fontFamily: 'Swissra',
     fontWeight: FontWeight.bold);
 
 const TextStyle tableSecondaryTextStyle = TextStyle(
-  color: Color(0xFF95989C),
+  color: highlightTextColor,
   fontFamily: 'SF-Pro-Display',
   fontSize: 8,
 );

@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:coinz/main.dart';
+import 'package:coinz/screens/main/main.dart';
 import 'package:flutter/material.dart';
-import 'package:coinz/widgets/gradient_box.dart';
-import 'package:coinz/styles.dart';
+import 'package:coinz/constants/styles.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -18,7 +17,7 @@ class _SplashPageState extends State<SplashPage> {
     super.initState();
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const MainPage()));
+          context, MaterialPageRoute(builder: (context) => const MainScreen()));
     });
   }
 
@@ -30,31 +29,7 @@ class _SplashPageState extends State<SplashPage> {
           alignment: AlignmentDirectional.center,
           fit: StackFit.expand,
           children: [
-            GridView.count(
-              childAspectRatio: 0.5,
-              crossAxisCount: 2,
-              mainAxisSpacing: 0,
-              crossAxisSpacing: 0,
-              children: const <Widget>[
-                GradientBox(
-                  startColor: Color(0xFFFFDB00),
-                  endColor: Color(0xFFFFA500),
-                ),
-                GradientBox(
-                  startColor: Color(0xFF9B81EC),
-                  endColor: Color(0xFFFB79B4),
-                ),
-                GradientBox(
-                  startColor: Color(0xFF58C4D8),
-                  endColor: Color(0xFF478EDA),
-                ),
-                GradientBox(
-                  startColor: Color(0xFF02DFB6),
-                  endColor: Color(0xFF47E546),
-                ),
-              ],
-            ),
-            const Expanded(child: SizedBox(height: 1)),
+            backgroundLayerBuilder(),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -81,18 +56,53 @@ class _SplashPageState extends State<SplashPage> {
                       ],
                     ),
                   ),
-                  // Container(
-                  //   width: 150,
-                  //   height: 135,
-                  //   decoration: BoxDecoration(
-                  //     borderRadius: BorderRadius.circular(16),
-                  //     border: Border.all(width: 15, color: Colors.white),
-                  //   ),
-                  // )
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  GridView backgroundLayerBuilder() {
+    return GridView.count(
+      childAspectRatio: 0.5,
+      crossAxisCount: 2,
+      mainAxisSpacing: 0,
+      crossAxisSpacing: 0,
+      children: <Widget>[
+        gradientBoxBuilder(
+          startColor: const Color(0xFFFFDB00),
+          endColor: const Color(0xFFFFA500),
+        ),
+        gradientBoxBuilder(
+          startColor: const Color(0xFF9B81EC),
+          endColor: const Color(0xFFFB79B4),
+        ),
+        gradientBoxBuilder(
+          startColor: const Color(0xFF58C4D8),
+          endColor: const Color(0xFF478EDA),
+        ),
+        gradientBoxBuilder(
+          startColor: const Color(0xFF02DFB6),
+          endColor: const Color(0xFF47E546),
+        ),
+      ],
+    );
+  }
+
+  Container gradientBoxBuilder(
+      {required Color startColor, required Color endColor}) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            startColor,
+            endColor,
+          ],
+          begin: Alignment.bottomLeft,
+          end: Alignment.centerRight,
         ),
       ),
     );
