@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:coinz/screens/main/main.dart';
+import 'package:coinz/main/main.dart';
 import 'package:flutter/material.dart';
 import 'package:coinz/constants/styles.dart';
 

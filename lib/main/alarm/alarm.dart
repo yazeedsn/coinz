@@ -1,4 +1,4 @@
-import 'package:coinz/screens/main/coins.dart';
+import 'package:coinz/main/coin.dart';
 
 class Alarm {
   Alarm({required this.coin, required this.value, required this.greater});

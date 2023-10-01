@@ -1,11 +1,16 @@
+import 'package:coinz/main/alarm/alarm_configuration_model.dart';
+import 'package:coinz/main/alarm/alarm_model.dart';
+import 'package:coinz/main/alarm/alarm_screen.dart';
+import 'package:coinz/main/home/home_screen.dart';
+import 'package:coinz/main/home/watch_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:coinz/widgets/tab_icon.dart';
 import 'package:coinz/constants/icons.dart';
-import 'package:coinz/screens/main/alarm/alarm_screen.dart';
-import 'package:coinz/screens/main/home/home_screen.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -57,9 +62,16 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: _bottomNavigationBarBuilder(),
-      body: pages[_currentIndex],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AlarmModel()),
+        ChangeNotifierProvider(create: (context) => WatchModel()),
+        ChangeNotifierProvider(create: (context) => AlarmConfigurationModel()),
+      ],
+      child: Scaffold(
+        bottomNavigationBar: _bottomNavigationBarBuilder(),
+        body: pages[_currentIndex],
+      ),
     );
   }
 

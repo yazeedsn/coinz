@@ -1,4 +1,6 @@
-List<Coin> coins = [
+import 'package:coinz/main/coin.dart';
+
+final List<Coin> coins = [
   Coin(
     0,
     nameAR: 'بيتكوين',
@@ -21,17 +23,3 @@ List<Coin> coins = [
     price: 10544.69,
   ),
 ];
-
-class Coin {
-  Coin(this.id,
-      {required this.nameAR,
-      required this.nameEN,
-      required this.icon,
-      required this.price});
-
-  final int id;
-  final String nameAR;
-  final String nameEN;
-  final String icon;
-  final double price;
-}

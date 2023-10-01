@@ -1,23 +1,18 @@
-import 'dart:math';
-
-import 'package:coinz/screens/main/coins.dart';
 import 'package:coinz/constants/colors.dart';
+import 'package:coinz/main/coin.dart';
+import 'package:coinz/main/coins.dart';
+import 'package:coinz/main/home/watch_model.dart';
+import 'package:coinz/main/home/widgets/animated_coin_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coinz/constants/styles.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
   });
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final List<Coin> watchList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   _lastUpdateBuilder(),
                   SizedBox(height: 14.h),
-                  _gridBuilder(watchList),
+                  _gridBuilder(context),
                 ],
               ),
             ),
@@ -78,33 +73,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  SizedBox _gridBuilder(List<Coin> watchList) {
+  Widget _gridBuilder(BuildContext context) {
     return SizedBox(
       height: 220.h,
       width: double.infinity,
-      child: GridView.count(
-        physics: const NeverScrollableScrollPhysics(),
-        clipBehavior: Clip.none,
-        crossAxisCount: 2,
-        childAspectRatio: 1.6,
-        mainAxisSpacing: 9,
-        crossAxisSpacing: 9,
-        children: <Widget>[
-              for (Coin coin in watchList) AnimatedCoinCard(coin: coin)
-            ] +
-            [
-              _addButtonBuilder(() {
-                setState(() {
-                  watchList.add(coins.first);
-                });
-              }),
-            ],
+      child: Consumer<WatchModel>(
+        builder: (context, watchList, child) => GridView.count(
+          physics: const NeverScrollableScrollPhysics(),
+          clipBehavior: Clip.none,
+          crossAxisCount: 2,
+          childAspectRatio: 1.6,
+          mainAxisSpacing: 9,
+          crossAxisSpacing: 9,
+          children: <Widget>[
+                for (int i = 0; i < watchList.length; i++)
+                  AnimatedCoinCard(
+                    onBackTap: () {
+                      context
+                          .read<WatchModel>()
+                          .remove(watchList.length - i - 1);
+                    },
+                    coin: watchList.get(i),
+                  )
+              ] +
+              [
+                _addButtonBuilder(() {
+                  Coin coin = coins[0];
+                  watchList.add(coin);
+                }),
+              ],
+        ),
       ),
     );
   }
 
-  InkWell _addButtonBuilder(void Function()? onTap) {
-    return InkWell(
+  Widget _addButtonBuilder(void Function()? onTap) {
+    return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 96.h,
@@ -138,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  ListView _listBuilder() {
+  Widget _listBuilder() {
     return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -147,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 0) {
             return _tableHeaderBuilder();
           } else {
-            return _tableRowBuilder(index);
+            return _tableRowBuilder(coins[index - 1]);
           }
         });
   }
@@ -174,13 +178,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _tableRowBuilder(int index) {
+  Widget _tableRowBuilder(Coin coin) {
     return _rowBuilder(
       height: 40.h,
       padding: EdgeInsets.symmetric(horizontal: 26.w),
       children: [
-        _coinCellBuilder(coin: coins[index - 1]),
-        _priceCellBuilder(price: 10544.69),
+        _coinCellBuilder(coin: coin),
+        _priceCellBuilder(price: coin.price),
         _trendCellBuilder(trend: 8.19),
       ],
     );
@@ -276,168 +280,6 @@ class _HomeScreenState extends State<HomeScreen> {
           style: tableMainEnTextStyle.copyWith(color: const Color(0xFF80CE13)),
         ),
       ],
-    );
-  }
-
-  Widget _coinGridCardBuilder({required Coin coin}) {
-    return AnimatedCoinCard(coin: coin);
-  }
-
-  Container _cardFrontBuilder(Coin coin) {
-    return Container(
-      height: 96.h,
-      width: 155.w,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.r),
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFFFFDB00),
-            Color(0xFFFFA500),
-          ],
-          begin: Alignment.bottomLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            coin.icon,
-            width: 30.w,
-            height: 30.h,
-            fit: BoxFit.contain,
-          ),
-          SizedBox(height: 4.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                coin.nameAR,
-                style: alarmCardArStyle.copyWith(color: Colors.white),
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                coin.nameEN,
-                style: alarmCardEnStyle.copyWith(color: Colors.white),
-              ),
-            ],
-          ),
-          Text(
-            '\$${coin.price}',
-            style: priceCardStyle,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Container _cardBackBuilder() {
-    return Container(
-      height: 96.h,
-      width: 155.w,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: const Text('إزالة'),
-    );
-  }
-}
-
-class AnimatedCoinCard extends StatefulWidget {
-  const AnimatedCoinCard({super.key, required this.coin});
-  final Coin coin;
-  @override
-  State<AnimatedCoinCard> createState() => _AnimatedCoinCardState();
-}
-
-class _AnimatedCoinCardState extends State<AnimatedCoinCard> {
-  bool _showFront = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(
-        //     content: Text('تمت إضافة منبه جديد'),
-        //   ),
-        // );
-        setState(() {
-          _showFront = !_showFront;
-        });
-      },
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 600),
-        switchInCurve: Curves.easeIn,
-        switchOutCurve: Curves.easeOut,
-        child:
-            (_showFront) ? _cardFrontBuilder(widget.coin) : _cardBackBuilder(),
-      ),
-    );
-  }
-
-  Container _cardFrontBuilder(Coin coin) {
-    return Container(
-      height: 96.h,
-      width: 155.w,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.r),
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFFFFDB00),
-            Color(0xFFFFA500),
-          ],
-          begin: Alignment.bottomLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            coin.icon,
-            width: 30.w,
-            height: 30.h,
-            fit: BoxFit.contain,
-          ),
-          SizedBox(height: 4.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                coin.nameAR,
-                style: alarmCardArStyle.copyWith(color: Colors.white),
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                coin.nameEN,
-                style: alarmCardEnStyle.copyWith(color: Colors.white),
-              ),
-            ],
-          ),
-          Text(
-            '\$${coin.price}',
-            style: priceCardStyle,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Container _cardBackBuilder() {
-    return Container(
-      height: 96.h,
-      width: 155.w,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: const Text('إزالة'),
     );
   }
 }

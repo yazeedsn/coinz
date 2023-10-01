@@ -1,32 +1,21 @@
-import 'package:coinz/screens/main/coins.dart';
-import 'package:coinz/screens/main/alarm/alarm.dart';
+import 'dart:collection';
+
+import 'package:coinz/main/alarm/alarm.dart';
+import 'package:coinz/main/alarm/alarm_configuration_model.dart';
+import 'package:coinz/main/alarm/alarm_model.dart';
+import 'package:coinz/main/coin.dart';
+import 'package:coinz/main/coins.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coinz/widgets/outlined_container.dart';
 import 'package:coinz/constants/styles.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-class AlarmScreen extends StatefulWidget {
+class AlarmScreen extends StatelessWidget {
   const AlarmScreen({
     super.key,
   });
-
-  @override
-  State<AlarmScreen> createState() => _AlarmScreenState();
-}
-
-class _AlarmScreenState extends State<AlarmScreen> {
-  final List<Alarm> alarms = [];
-
-  final TextEditingController priceValueController = TextEditingController();
-  int coinId = 0;
-  bool greater = true;
-
-  @override
-  void initState() {
-    priceValueController.text = '\$100000';
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +28,6 @@ class _AlarmScreenState extends State<AlarmScreen> {
             Padding(
               padding: EdgeInsets.only(left: 22.w, right: 22.w, top: 30.h),
               child: Column(
-                //mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
@@ -52,56 +40,58 @@ class _AlarmScreenState extends State<AlarmScreen> {
                     style: secondaryStyle,
                   ),
                   SizedBox(height: 9.h),
-                  _coinSelectorBuilder(
-                      onChange: (value) => coinId = value ?? 0),
+                  _coinSelectorBuilder(context),
                   SizedBox(height: 18.h),
                   const Text(
                     'يرجى تحديد قيمة المنبه',
                     style: secondaryStyle,
                   ),
                   SizedBox(height: 9.h),
-                  _alarmValueSpeciferBuilder(controller: priceValueController),
+                  _alarmValueSpeciferBuilder(context),
                   SizedBox(height: 20.h),
-                  _addAlarmButtonBuilder(onTap: _alarmButtonOnTap),
+                  _addAlarmButtonBuilder(onTap: () {
+                    AlarmConfigurationModel config =
+                        context.read<AlarmConfigurationModel>();
+                    _alarmButtonOnTap(context, config.selected, config.greater);
+                  }),
                   SizedBox(height: 32.h),
                 ],
               ),
             ),
             const Divider(color: Color(0xFFF8F9FB)),
             SizedBox(height: 20.h),
-            _alarmsListBuilder(alarms),
+            _alarmsListBuilder(context.read<AlarmModel>().alarms),
           ],
         ),
       ),
     );
   }
 
-  void _showSnakBar(String message) {
+  void _showSnakBar(context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تمت إضافة منبه جديد'),
+      SnackBar(
+        content: Text(message),
       ),
     );
   }
 
-  void _alarmButtonOnTap() {
+  void _alarmButtonOnTap(BuildContext context, int coinId, bool greater) {
     FocusScope.of(context).unfocus();
 
-    setState(() {
-      alarms.add(
-        Alarm(
-            coin: coins[coinId],
-            value:
-                double.parse(priceValueController.text.replaceFirst('\$', '')),
-            greater: greater),
-      );
-    });
-
-    _showSnakBar('تمت إضافة منبه جديد');
+    Alarm alarm = Alarm(
+        coin: coins[coinId],
+        value: double.parse(context
+            .read<AlarmConfigurationModel>()
+            .controller
+            .text
+            .replaceFirst('\$', '')),
+        greater: greater);
+    context.read<AlarmModel>().add(alarm);
+    _showSnakBar(context, 'تمت إضافة منبه جديد');
   }
 
-  OutlinedContainer _coinSelectorBuilder(
-      {required void Function(int?) onChange}) {
+  Widget _coinSelectorBuilder(BuildContext context) {
+    AlarmConfigurationModel model = context.read<AlarmConfigurationModel>();
     return OutlinedContainer(
       height: 56.h,
       padding: EdgeInsets.zero,
@@ -110,8 +100,8 @@ class _AlarmScreenState extends State<AlarmScreen> {
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
         ),
-        value: 0,
-        onChanged: onChange,
+        value: model.selected,
+        onChanged: (value) => model.changeCoin(value ?? 0),
         items: [
           for (Coin coin in coins)
             DropdownMenuItem(
@@ -147,37 +137,40 @@ class _AlarmScreenState extends State<AlarmScreen> {
     );
   }
 
-  OutlinedContainer _alarmValueSpeciferBuilder(
-      {required TextEditingController controller}) {
+  OutlinedContainer _alarmValueSpeciferBuilder(BuildContext context) {
+    AlarmConfigurationModel model = context.read<AlarmConfigurationModel>();
     return OutlinedContainer(
       padding: EdgeInsets.zero,
       height: 56.h,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
-          Expanded(child: _comparsionDropDownMenuBuilder()),
+          Expanded(
+            child: _comparsionDropDownMenuBuilder(context),
+          ),
           const VerticalDivider(
             color: Color(0xFFF8F8F8),
           ),
           Expanded(
-            child: _priceTextfieldBuilder(
-              controller: controller,
-            ),
+            child: _priceTextfieldBuilder(controller: model.controller),
           ),
         ],
       ),
     );
   }
 
-  DropdownButtonFormField _comparsionDropDownMenuBuilder() {
+  DropdownButtonFormField _comparsionDropDownMenuBuilder(BuildContext context) {
+    AlarmConfigurationModel model = context.read<AlarmConfigurationModel>();
     return DropdownButtonFormField(
       isExpanded: true,
       decoration: const InputDecoration(
         icon: null,
         border: InputBorder.none,
       ),
-      value: 0,
-      onChanged: (value) {},
+      value: (model.greater) ? 0 : 1,
+      onChanged: (value) {
+        model.flipGreater();
+      },
       items: const [
         DropdownMenuItem(
             alignment: Alignment.center,
@@ -195,9 +188,9 @@ class _AlarmScreenState extends State<AlarmScreen> {
     );
   }
 
-  InkWell _addAlarmButtonBuilder({void Function()? onTap}) {
+  InkWell _addAlarmButtonBuilder({required void Function() onTap}) {
     return InkWell(
-      onTap: onTap,
+      onTap: () => onTap(),
       child: Container(
         height: 55.h,
         width: double.infinity,
@@ -224,34 +217,31 @@ class _AlarmScreenState extends State<AlarmScreen> {
     );
   }
 
-  Padding _alarmsListBuilder(List<Alarm> alarms) {
+  Padding _alarmsListBuilder(UnmodifiableListView<Alarm> alarms) {
     return Padding(
       padding: EdgeInsets.fromLTRB(22.w, 0.h, 22.w, 16.h),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: alarms.length,
-        itemBuilder: (context, index) => _alarmCardBuilder(
-          () {
-            setState(() {
-              alarms.removeAt(index);
-            });
-            _showSnakBar('تم حذف المنبه');
-          },
-          coin: alarms[index].coin,
-          threshold: alarms[index].value,
-          greater: alarms[index].greater,
+      child: Consumer<AlarmModel>(
+        builder: (BuildContext context, AlarmModel alarms, Widget? child) =>
+            ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: alarms.length,
+          itemBuilder: (context, index) => _alarmCardBuilder(
+            () {
+              alarms.remove(index);
+              _showSnakBar(context, 'تم حذف المنبه');
+            },
+            alarm: alarms.get(index),
+          ),
+          separatorBuilder: (context, index) => SizedBox(height: 12.h),
         ),
-        separatorBuilder: (context, index) => SizedBox(height: 12.h),
       ),
     );
   }
 
   Widget _alarmCardBuilder(
     void Function() onTap, {
-    required Coin coin,
-    required double threshold,
-    required bool greater,
+    required Alarm alarm,
   }) {
     return OutlinedContainer(
       height: 66.h,
@@ -259,9 +249,9 @@ class _AlarmScreenState extends State<AlarmScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _alarmCardIconBuilder(coin),
+          _alarmCardIconBuilder(alarm.coin),
           SizedBox(width: 18.w),
-          _alarmCardTextBuilder(coin, greater, threshold),
+          _alarmCardTextBuilder(alarm),
           const Expanded(child: SizedBox(width: 1)),
           InkWell(
             onTap: onTap,
@@ -276,7 +266,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
     );
   }
 
-  Column _alarmCardTextBuilder(Coin coin, bool greater, double threshold) {
+  Column _alarmCardTextBuilder(Alarm alarm) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,12 +274,12 @@ class _AlarmScreenState extends State<AlarmScreen> {
         Row(
           children: [
             Text(
-              coin.nameAR,
+              alarm.coin.nameAR,
               style: alarmCardEnStyle,
             ),
             SizedBox(width: 6.w),
             Text(
-              coin.nameEN,
+              alarm.coin.nameEN,
               style: alarmCardEnStyle,
             ),
           ],
@@ -297,16 +287,16 @@ class _AlarmScreenState extends State<AlarmScreen> {
         Row(
           children: [
             Text(
-              (greater) ? 'أكبر من' : 'أقل من',
+              (alarm.greater) ? 'أكبر من' : 'أقل من',
               style: alarmCardEnStyle.copyWith(
-                color: (greater)
+                color: (alarm.greater)
                     ? const Color(0xFF38AD65)
                     : const Color(0xFFE72222),
               ),
             ),
             SizedBox(width: 8.w),
             Text(
-              '$threshold',
+              '${alarm.value}',
               style: priceCardStyle.copyWith(
                 color: const Color(0xFF38AD65),
               ),
