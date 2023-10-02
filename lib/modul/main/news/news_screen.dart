@@ -1,7 +1,7 @@
-import 'package:coinz/constants/colors.dart';
-import 'package:coinz/widgets/outlined_container.dart';
+import 'package:coinz/app/colors.dart';
+import 'package:coinz/widget/outlined_container.dart';
 import 'package:flutter/material.dart';
-import 'package:coinz/constants/styles.dart';
+import 'package:coinz/app/styles.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -26,7 +26,7 @@ class NewsScreen extends StatelessWidget {
                   child: Text(
                     'جاري تحميل المزيد',
                     style: TextStyle(
-                      color: highlightTextColor,
+                      color: grey95989C,
                       fontSize: 10.sp,
                       fontWeight: FontWeight.w300,
                     ),

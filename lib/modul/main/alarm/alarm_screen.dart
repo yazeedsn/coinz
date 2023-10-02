@@ -1,14 +1,14 @@
 import 'dart:collection';
 
-import 'package:coinz/main/alarm/alarm.dart';
-import 'package:coinz/main/alarm/alarm_configuration_model.dart';
-import 'package:coinz/main/alarm/alarm_model.dart';
-import 'package:coinz/main/coin.dart';
-import 'package:coinz/main/coins.dart';
+import 'package:coinz/app/colors.dart';
+import 'package:coinz/model/alarm.dart';
+import 'package:coinz/modul/main/alarm/alarm_controller.dart';
+import 'package:coinz/model/coin.dart';
+import 'package:coinz/app/coins.dart';
 import 'package:flutter/material.dart';
 
-import 'package:coinz/widgets/outlined_container.dart';
-import 'package:coinz/constants/styles.dart';
+import 'package:coinz/widget/outlined_container.dart';
+import 'package:coinz/app/styles.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -50,17 +50,18 @@ class AlarmScreen extends StatelessWidget {
                   _alarmValueSpeciferBuilder(context),
                   SizedBox(height: 20.h),
                   _addAlarmButtonBuilder(onTap: () {
-                    AlarmConfigurationModel config =
-                        context.read<AlarmConfigurationModel>();
-                    _alarmButtonOnTap(context, config.selected, config.greater);
+                    AlarmController controller =
+                        context.read<AlarmController>();
+                    _alarmButtonOnTap(
+                        context, controller.selected, controller.greater);
                   }),
                   SizedBox(height: 32.h),
                 ],
               ),
             ),
-            const Divider(color: Color(0xFFF8F9FB)),
+            const Divider(color: whiteFFF8F9FB),
             SizedBox(height: 20.h),
-            _alarmsListBuilder(context.read<AlarmModel>().alarms),
+            _alarmsListBuilder(context.read<AlarmController>().alarms),
           ],
         ),
       ),
@@ -80,18 +81,15 @@ class AlarmScreen extends StatelessWidget {
 
     Alarm alarm = Alarm(
         coin: coins[coinId],
-        value: double.parse(context
-            .read<AlarmConfigurationModel>()
-            .controller
-            .text
-            .replaceFirst('\$', '')),
+        value: double.parse(
+            context.read<AlarmController>().text.replaceFirst('\$', '')),
         greater: greater);
-    context.read<AlarmModel>().add(alarm);
+    context.read<AlarmController>().add(alarm);
     _showSnakBar(context, 'تمت إضافة منبه جديد');
   }
 
   Widget _coinSelectorBuilder(BuildContext context) {
-    AlarmConfigurationModel model = context.read<AlarmConfigurationModel>();
+    AlarmController model = context.read<AlarmController>();
     return OutlinedContainer(
       height: 56.h,
       padding: EdgeInsets.zero,
@@ -101,7 +99,7 @@ class AlarmScreen extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
         ),
         value: model.selected,
-        onChanged: (value) => model.changeCoin(value ?? 0),
+        onChanged: (value) => model.setCoin(value ?? 0),
         items: [
           for (Coin coin in coins)
             DropdownMenuItem(
@@ -138,7 +136,7 @@ class AlarmScreen extends StatelessWidget {
   }
 
   OutlinedContainer _alarmValueSpeciferBuilder(BuildContext context) {
-    AlarmConfigurationModel model = context.read<AlarmConfigurationModel>();
+    AlarmController model = context.read<AlarmController>();
     return OutlinedContainer(
       padding: EdgeInsets.zero,
       height: 56.h,
@@ -160,7 +158,7 @@ class AlarmScreen extends StatelessWidget {
   }
 
   DropdownButtonFormField _comparsionDropDownMenuBuilder(BuildContext context) {
-    AlarmConfigurationModel model = context.read<AlarmConfigurationModel>();
+    AlarmController model = context.read<AlarmController>();
     return DropdownButtonFormField(
       isExpanded: true,
       decoration: const InputDecoration(
@@ -220,9 +218,10 @@ class AlarmScreen extends StatelessWidget {
   Padding _alarmsListBuilder(UnmodifiableListView<Alarm> alarms) {
     return Padding(
       padding: EdgeInsets.fromLTRB(22.w, 0.h, 22.w, 16.h),
-      child: Consumer<AlarmModel>(
-        builder: (BuildContext context, AlarmModel alarms, Widget? child) =>
-            ListView.separated(
+      child: Consumer<AlarmController>(
+        builder:
+            (BuildContext context, AlarmController alarms, Widget? child) =>
+                ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: alarms.length,

@@ -1,3 +1,4 @@
+import 'package:coinz/app/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -28,7 +29,7 @@ class OutlinedContainer extends StatelessWidget {
           padding ?? EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        border: Border.all(color: outlineColor ?? const Color(0xFFF4F4F4)),
+        border: Border.all(color: outlineColor ?? whiteF4F4F4),
         borderRadius: borderRadius ?? BorderRadius.circular(8.r),
       ),
       child: child,

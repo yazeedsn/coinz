@@ -1,4 +1,4 @@
-import 'package:coinz/main/coin.dart';
+import 'package:coinz/model/coin.dart';
 
 final List<Coin> coins = [
   Coin(

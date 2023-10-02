@@ -1,28 +1,18 @@
 import 'dart:async';
 
-import 'package:coinz/main/main.dart';
+import 'package:coinz/modul/main/main_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:coinz/constants/styles.dart';
+import 'package:coinz/app/styles.dart';
 
-class SplashPage extends StatefulWidget {
-  const SplashPage({super.key});
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
-}
-
-class _SplashPageState extends State<SplashPage> {
-  @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const MainScreen()));
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Stack(

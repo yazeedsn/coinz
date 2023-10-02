@@ -1,9 +1,9 @@
 import 'dart:collection';
 
-import 'package:coinz/main/coin.dart';
+import 'package:coinz/model/coin.dart';
 import 'package:flutter/material.dart';
 
-class WatchModel extends ChangeNotifier {
+class HomeController extends ChangeNotifier {
   final List<Coin> _watchList = [];
   final List<bool> _isFront = [];
 

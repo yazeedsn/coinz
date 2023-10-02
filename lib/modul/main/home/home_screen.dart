@@ -1,12 +1,13 @@
-import 'package:coinz/constants/colors.dart';
-import 'package:coinz/main/coin.dart';
-import 'package:coinz/main/coins.dart';
-import 'package:coinz/main/home/watch_model.dart';
 import 'package:flutter/material.dart';
-
-import 'package:coinz/constants/styles.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:coinz/app/colors.dart';
+import 'package:coinz/app/coins.dart';
+import 'package:coinz/app/styles.dart';
+import 'package:coinz/model/coin.dart';
+
+import 'package:coinz/modul/main/home/home_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -52,7 +53,7 @@ class HomeScreen extends StatelessWidget {
           ' :آخر تحديث',
           textAlign: TextAlign.start,
           style: TextStyle(
-            color: highlightTextColor,
+            color: grey95989C,
             fontSize: 12.sp,
             fontFamily: 'Swissra',
             fontWeight: FontWeight.w300,
@@ -62,7 +63,7 @@ class HomeScreen extends StatelessWidget {
           '09-27-2023',
           textAlign: TextAlign.start,
           style: TextStyle(
-            color: highlightTextColor,
+            color: grey95989C,
             fontSize: 12.sp,
             fontFamily: 'SF-Pro-Display',
             fontWeight: FontWeight.w300,
@@ -76,7 +77,7 @@ class HomeScreen extends StatelessWidget {
     return SizedBox(
       height: 220.h,
       width: double.infinity,
-      child: Consumer<WatchModel>(builder: (context, watchList, child) {
+      child: Consumer<HomeController>(builder: (context, watchList, child) {
         return GridView.count(
           physics: const NeverScrollableScrollPhysics(),
           clipBehavior: Clip.none,
@@ -102,12 +103,77 @@ class HomeScreen extends StatelessWidget {
               ] +
               [
                 _addButtonBuilder(() {
-                  Coin coin = coins[0];
-                  watchList.add(coin);
+                  showBottomSheet<void>(
+                      context: context,
+                      builder: (context) {
+                        return _bottomSheetContentBuilder(watchList);
+                      });
                 }),
               ],
         );
       }),
+    );
+  }
+
+  Container _bottomSheetContentBuilder(HomeController watchList) {
+    return Container(
+      height: 500.h,
+      padding: EdgeInsets.only(top: 12.h, right: 18.w),
+      color: whiteF4F4F4,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'قم بتحديد العملة المراد إضافتها',
+            style: headingStyle.copyWith(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: coins.length,
+              itemBuilder: (context, index) => _coinSelectMenuItemBuilder(
+                coin: coins[index],
+                onTap: () {
+                  watchList.add(coins[index]);
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _coinSelectMenuItemBuilder(
+      {required Coin coin, required void Function() onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 10.h),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.asset(coin.icon, width: 23.w, height: 23.h),
+            SizedBox(width: 12.w),
+            Text(
+              coin.nameAR,
+              style: dropdownArStyle,
+              textAlign: TextAlign.start,
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              coin.nameEN,
+              textAlign: TextAlign.start,
+              style: dropdownEnStyle,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -120,8 +186,8 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFFFDB00),
-            Color(0xFFFFA500),
+            yellowFFDB00,
+            orangeFFA500,
           ],
           begin: Alignment.bottomLeft,
           end: Alignment.centerRight,
@@ -181,7 +247,7 @@ class HomeScreen extends StatelessWidget {
         width: 155.w,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: const Color(0xFFF9F9FA),
+          color: whiteF9F9FA,
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Column(
@@ -191,7 +257,7 @@ class HomeScreen extends StatelessWidget {
               width: 26.r,
               height: 26.r,
               decoration: BoxDecoration(
-                color: const Color(0xFF000000).withOpacity(0.18),
+                color: Colors.black.withOpacity(0.18),
                 shape: BoxShape.circle,
               ),
             ),
@@ -199,7 +265,7 @@ class HomeScreen extends StatelessWidget {
             Text(
               'إضغط للاضافة',
               style: alarmCardArStyle.copyWith(
-                color: const Color(0xFF000000).withOpacity(0.18),
+                color: Colors.black.withOpacity(0.18),
               ),
             )
           ],
@@ -226,7 +292,7 @@ class HomeScreen extends StatelessWidget {
     return _rowBuilder(
       height: 42.h,
       padding: EdgeInsets.symmetric(horizontal: 26.w),
-      backgroundColor: const Color(0xFFF8F9FB),
+      backgroundColor: whiteFFF8F9FB,
       children: const [
         Text(
           'العملة',
@@ -343,7 +409,7 @@ class HomeScreen extends StatelessWidget {
         SizedBox(width: 6.h),
         Text(
           '$trend%',
-          style: tableMainEnTextStyle.copyWith(color: const Color(0xFF80CE13)),
+          style: tableMainEnTextStyle.copyWith(color: green80CE13),
         ),
       ],
     );
