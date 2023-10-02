@@ -3,6 +3,7 @@ import 'package:coinz/main/alarm/alarm_model.dart';
 import 'package:coinz/main/alarm/alarm_screen.dart';
 import 'package:coinz/main/home/home_screen.dart';
 import 'package:coinz/main/home/watch_model.dart';
+import 'package:coinz/main/news/news_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -52,10 +53,10 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final List<Widget> pages = [
-    const HomeScreen(),
-    const AlarmScreen(),
-    Container(),
+  final List<Widget> pages = const [
+    HomeScreen(),
+    AlarmScreen(),
+    NewsScreen(),
   ];
 
   int _currentIndex = 0;

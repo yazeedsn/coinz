@@ -2,7 +2,6 @@ import 'package:coinz/constants/colors.dart';
 import 'package:coinz/main/coin.dart';
 import 'package:coinz/main/coins.dart';
 import 'package:coinz/main/home/watch_model.dart';
-import 'package:coinz/main/home/widgets/animated_coin_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:coinz/constants/styles.dart';
@@ -77,8 +76,8 @@ class HomeScreen extends StatelessWidget {
     return SizedBox(
       height: 220.h,
       width: double.infinity,
-      child: Consumer<WatchModel>(
-        builder: (context, watchList, child) => GridView.count(
+      child: Consumer<WatchModel>(builder: (context, watchList, child) {
+        return GridView.count(
           physics: const NeverScrollableScrollPhysics(),
           clipBehavior: Clip.none,
           crossAxisCount: 2,
@@ -87,13 +86,18 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 9,
           children: <Widget>[
                 for (int i = 0; i < watchList.length; i++)
-                  AnimatedCoinCard(
-                    onBackTap: () {
-                      context
-                          .read<WatchModel>()
-                          .remove(watchList.length - i - 1);
+                  GestureDetector(
+                    onTap: () {
+                      if (!watchList.isFront(i)) {
+                        watchList.remove(i);
+                      }
                     },
-                    coin: watchList.get(i),
+                    onLongPress: () {
+                      watchList.flip(i);
+                    },
+                    child: (watchList.isFront(i))
+                        ? _cardFrontBuilder(watchList.get(i))
+                        : _cardBackBuilder(),
                   )
               ] +
               [
@@ -102,8 +106,70 @@ class HomeScreen extends StatelessWidget {
                   watchList.add(coin);
                 }),
               ],
+        );
+      }),
+    );
+  }
+
+  Container _cardFrontBuilder(Coin coin) {
+    return Container(
+      height: 96.h,
+      width: 155.w,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.r),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFFFFDB00),
+            Color(0xFFFFA500),
+          ],
+          begin: Alignment.bottomLeft,
+          end: Alignment.centerRight,
         ),
       ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            coin.icon,
+            width: 30.w,
+            height: 30.h,
+            fit: BoxFit.contain,
+          ),
+          SizedBox(height: 4.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                coin.nameAR,
+                style: alarmCardArStyle.copyWith(color: Colors.white),
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                coin.nameEN,
+                style: alarmCardEnStyle.copyWith(color: Colors.white),
+              ),
+            ],
+          ),
+          Text(
+            '\$${coin.price}',
+            style: priceCardStyle,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _cardBackBuilder() {
+    return Container(
+      height: 96.h,
+      width: 155.w,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: const Text('إزالة'),
     );
   }
 
